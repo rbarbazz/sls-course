@@ -1,8 +1,10 @@
 import AWS from 'aws-sdk'
 import createError from 'http-errors'
+import validator from '@middy/validator'
 
 import { getAuctionById } from './getAuction'
 import commonMiddleware from '../lib/commonMiddleware'
+import placeBidSchema from '../lib/schemas/placeBidSchema'
 
 const dynamobdb = new AWS.DynamoDB.DocumentClient()
 
@@ -11,6 +13,10 @@ async function placeBid(event, context) {
   const { amount } = event.body
 
   let auction = await getAuctionById(id)
+
+  if (auction.status != 'OPEN') {
+    throw new createError.Forbidden('You cannot bid on closed auctions.')
+  }
 
   if (amount <= auction.highestBid.amount) {
     throw new createError.Forbidden(
@@ -43,4 +49,6 @@ async function placeBid(event, context) {
   }
 }
 
-export const handler = commonMiddleware(placeBid)
+export const handler = commonMiddleware(placeBid).use(
+  validator({ inputSchema: placeBidSchema }),
+)

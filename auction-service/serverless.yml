@@ -43,6 +43,11 @@ functions:
           method: PATCH
           path: /auction/{id}/bid
 
+  processAuctions:
+    handler: src/handlers/processAuctions.handler
+    # events:
+    #   - schedule: rate(1 minute)
+
 resources:
   Resources:
     AuctionsTable: ${file(resources/AuctionsTable.yml):AuctionsTable}
