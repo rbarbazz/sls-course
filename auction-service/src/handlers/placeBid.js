@@ -23,7 +23,7 @@ async function placeBid(event, context) {
     throw new createError.Forbidden(`You can't bid on your own auction`)
   }
 
-  if (email === auction.highestBid.bider) {
+  if (email === auction.highestBid.bidder) {
     throw new createError.Forbidden(`You can't double bid`)
   }
 
@@ -37,8 +37,8 @@ async function placeBid(event, context) {
     Key: { id },
     TableName: process.env.AUCTIONS_TABLE_NAME,
     UpdateExpression:
-      'set highestBid.amount = :amount, highestBid.bider = :bider',
-    ExpressionAttributeValues: { ':amount': amount, ':bider': email },
+      'set highestBid.amount = :amount, highestBid.bidder = :bidder',
+    ExpressionAttributeValues: { ':amount': amount, ':bidder': email },
     ReturnValues: 'ALL_NEW',
   }
   let updatedAuction
